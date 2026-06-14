@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enter Verification Code</title>
+    <style>
+        body {
+            background-color: #1e293b;
+            color: #ffffff;
+            font-family: 'Tahoma', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+        h2 { color: #dbb583; margin-bottom: 10px; }
+        p { color: #94a3b8; font-size: 14px; margin-bottom: 30px; }
+        .form-group { margin-bottom: 20px; text-align: left; }
+        label { display: block; font-size: 12px; color: #94a3b8; margin-bottom: 5px; }
+        input {
+            width: 100%;
+            padding: 12px;
+            background-color: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            color: white;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        input.code-input {
+            text-align: center;
+            font-size: 24px;
+            letter-spacing: 8px;
+            font-weight: bold;
+            color: #10b981;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #10b981;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 10px;
+        }
+        button:hover { background-color: #059669; }
+        .message { margin-top: 20px; font-size: 14px; display: none; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Verify Account Identity</h2>
+    <p>Please type the 6-digit confirmation code code sent to your inbox profile below.</p>
+    
+    <form id="otpForm">
+        <div class="form-group">
+            <label for="email">Email Address Identity</label>
+            <input type="email" id="email" value="{{ email }}" required readonly>
+        </div>
+        <div class="form-group">
+            <label for="code">6-Digit Code Token</label>
+            <input type="text" id="code" class="code-input" maxlength="6" placeholder="000000" required autocomplete="off">
+        </div>
+        <button type="submit">Confirm Activation</button>
+    </form>
+    
+    <div id="responseMessage" class="message"></div>
+</div>
+
+<script>
+    document.getElementById('otpForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const email = document.getElementById('email').value;
+        const code = document.getElementById('code').value;
+        const msgDiv = document.getElementById('responseMessage');
+        
+        try {
+            const response = await fetch(`/auth/verify-code?email=${encodeURIComponent(email)}&code=${encodeURIComponent(code)}`, {
+                method: 'POST'
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+                msgDiv.style.color = '#10b981';
+                msgDiv.innerText = data.message + " Redirecting to login portal...";
+                msgDiv.style.display = 'block';
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 3000);
+            } else {
+                msgDiv.style.color = '#ef4444';
+                msgDiv.innerText = data.detail || "Verification sequence encountered a failure state.";
+                msgDiv.style.display = 'block';
+            }
+        } catch (err) {
+            msgDiv.style.color = '#ef4444';
+            msgDiv.innerText = "Network connection interface offline.";
+            msgDiv.style.display = 'block';
+        }
+    });
+</script>
+</body>
+</html>
