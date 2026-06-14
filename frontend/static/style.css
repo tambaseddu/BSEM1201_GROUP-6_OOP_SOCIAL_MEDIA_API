@@ -1,0 +1,691 @@
+/* ==========================================================================
+   1. GLOBAL VARIABLES & RESET
+   ========================================================================== */
+:root {
+    --bg-dark: #0f172a;          /* Slate 900 (Main Deep Background) */
+    --card-dark: #1e293b;        /* Slate 800 (Card Panels) */
+    --panel-inner: #131d31;      /* Deep navy for inner items */
+    --primary: #3b82f6;          /* Vibrant Blue */
+    --accent: #10b981;          /* Emerald Green */
+    --danger: #ef4444;          /* Red */
+    --text-main: #ffffff;       /* Pure White text */
+    --text-muted: #94a3b8;      /* Slate 400 text */
+    --border-slate: #334155;    /* Slate 700 */
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    font-family: 'Tahoma', 'Segoe UI', Geneva, Verdana, sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* ==========================================================================
+   2. MAIN CORE LAYOUT
+   ========================================================================== */
+.dashboard-layout {
+    display: flex;
+    min-height: 100vh;
+    width: 100vw;
+}
+
+/* Fixed Left Navigation Bar */
+.sidebar {
+    width: 260px;
+    background-color: #020617; /* Ultra-dark slate */
+    border-right: 1px solid var(--border-slate);
+    padding: 2rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    height: 100vh;
+    z-index: 10;
+}
+
+.sidebar .logo {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 3rem;
+    letter-spacing: 0.5px;
+}
+
+.sidebar nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.sidebar nav a {
+    color: var(--text-muted);
+    text-decoration: none;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+}
+
+.sidebar nav a:hover, .sidebar nav a.active {
+    background-color: var(--card-dark);
+    color: var(--text-main);
+}
+
+/* 2-Column Right-Hand Workspace Grid Engine */
+.main-workspace-grid {
+    margin-left: 260px; /* Counter-acts the fixed sidebar */
+    display: grid;
+    grid-template-columns: 1fr; /* Default: hidden panel means feed takes full width */
+    gap: 2.5rem;
+    width: calc(100% - 260px);
+    padding: 2.5rem;
+    transition: grid-template-columns 0.25s ease-in-out;
+}
+
+/* Activated State: Allocates space smoothly for the sidebar panel */
+.main-workspace-grid.panel-active {
+    grid-template-columns: 1fr 360px;
+}
+
+/* ==========================================================================
+   3. LEFT COLUMN: FEED ENGINE
+   ========================================================================== */
+.feed-container {
+    width: 100%;
+}
+
+.feed-header h2 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    color: var(--text-main);
+}
+
+/* Create Post Box UI Component */
+.create-post-card {
+    background-color: var(--card-dark);
+    border: 1px solid var(--border-slate);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.create-post-card textarea {
+    width: 100%;
+    height: 100px;
+    background-color: var(--bg-dark);
+    border: 1px solid var(--border-slate);
+    border-radius: 8px;
+    padding: 1rem;
+    color: var(--text-main);
+    font-family: inherit;
+    resize: none;
+    margin-bottom: 1rem;
+    outline: none;
+}
+
+.create-post-card textarea:focus {
+    border-color: var(--primary);
+}
+
+/* Feed Post Cards */
+.post-card {
+    background-color: var(--card-dark);
+    border: 1px solid var(--border-slate);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.25rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.post-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.post-meta strong {
+    color: var(--primary);
+    font-size: 0.95rem;
+}
+
+.post-meta .date {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+.post-body {
+    font-size: 1.05rem;
+    line-height: 1.5;
+    margin-bottom: 1.25rem;
+    color: #f1f5f9;
+}
+
+.post-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+/* Buttons Engine */
+.btn {
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn:hover {
+    background-color: #2563eb;
+}
+
+.post-actions button {
+    background-color: var(--panel-inner);
+    color: var(--text-main);
+    border: 1px solid var(--border-slate);
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: background 0.2s;
+}
+
+.post-actions button:hover {
+    background-color: var(--border-slate);
+}
+
+.post-actions button.btn-delete:hover {
+    background-color: var(--danger);
+    border-color: var(--danger);
+    color: white;
+}
+
+/* ==========================================================================
+   4. RIGHT COLUMN: NOTIFICATIONS ENGINE (FIXED CONFLICTS)
+   ========================================================================== */
+.notifications-panel {
+    background-color: var(--card-dark);
+    border: 1px solid var(--border-slate);
+    border-radius: 12px;
+    padding: 1.5rem;
+    height: fit-content;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    
+    /* Hide cleanly by default and handle sliding motion transitions */
+    display: none;
+    opacity: 0;
+    transform: translateX(20px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+/* Structural display rule applied directly when grid container scales out */
+.main-workspace-grid.panel-active .notifications-panel {
+    display: block;
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.notifications-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border-slate);
+}
+
+.notifications-header h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.btn-clear-all {
+    background: transparent;
+    border: none;
+    color: var(--accent);
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.btn-clear-all:hover {
+    text-decoration: underline;
+}
+
+/* Individual Notifications Alert Strip */
+.notification-item {
+    background-color: var(--panel-inner);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 0.75rem;
+    position: relative;
+    border-left: 4px solid var(--border-slate);
+    transition: transform 0.2s;
+}
+
+/* Target explicit custom unread alerts */
+.notification-item.unread-alert {
+    border-left-color: var(--accent);
+    background-color: #1e293b;
+}
+
+.notif-text {
+    font-size: 0.9rem;
+    line-height: 1.4;
+    margin-bottom: 0.25rem;
+    padding-right: 1.5rem; /* Prevents text colliding with checkbox tick */
+}
+
+.notif-time {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.btn-read-tick {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: var(--border-slate);
+    border: none;
+    color: var(--accent);
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    cursor: pointer;
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.btn-read-tick:hover {
+    background-color: var(--accent);
+    color: white;
+}
+
+.empty-state {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    text-align: center;
+    padding: 1.5rem 0;
+}
+
+/* ==========================================================================
+   5. AUTHENTICATION GATEWAY PORTAL STYLES
+   ========================================================================== */
+.auth-body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 2rem;
+}
+
+.auth-wrapper {
+    width: 100%;
+    max-width: 450px;
+    text-align: center;
+}
+
+.auth-brand {
+    margin-bottom: 2.5rem;
+}
+
+.auth-brand h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--primary);
+    letter-spacing: -0.5px;
+    margin-bottom: 0.5rem;
+}
+
+.auth-brand p {
+    color: var(--text-muted);
+    font-size: 1rem;
+}
+
+/* Auth Cards Stack container */
+.auth-container {
+    position: relative;
+    width: 100%;
+}
+
+.auth-card {
+    background-color: var(--card-dark);
+    border: 1px solid var(--border-slate);
+    border-radius: 16px;
+    padding: 2.5rem 2rem;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+    text-align: left;
+    display: none; /* Hidden by default, toggled via active-panel class */
+    width: 100%;
+}
+
+/* Toggle utility class via JS */
+.auth-card.active-panel {
+    display: block;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.auth-card h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 0.35rem;
+}
+
+.auth-card .subtitle {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-bottom: 2rem;
+}
+
+/* Standardized Form Fields */
+.form-group {
+    margin-bottom: 1.25rem;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #cbd5e1;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.form-group input {
+    width: 100%;
+    background-color: var(--panel-inner);
+    border: 1px solid var(--border-slate);
+    color: var(--text-main);
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.form-group input:focus {
+    border-color: var(--primary);
+}
+
+/* Button Layout Modifications */
+.btn-block {
+    width: 100%;
+    padding: 0.85rem;
+    font-size: 1rem;
+    margin-top: 0.75rem;
+}
+
+.btn-accent {
+    background-color: var(--accent);
+}
+
+.btn-accent:hover {
+    background-color: #059669;
+}
+
+/* Footer layout inside portal cards */
+.auth-toggle-footer {
+    margin-top: 1.5rem;
+    text-align: center;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.auth-toggle-footer a {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 600;
+    margin-left: 0.25rem;
+}
+
+.auth-toggle-footer a:hover {
+    text-decoration: underline;
+}
+
+/* Smooth Entrance Transition */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ==========================================================================
+   6. USER PROFILE CARD & SOCIAL BADGES
+   ========================================================================== */
+.user-profile-widget {
+    background-color: var(--card-dark);
+    border: 1px solid var(--border-slate);
+    border-radius: 12px;
+    padding: 1.25rem;
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.user-profile-widget .avatar-placeholder {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.user-profile-widget h4 {
+    color: white;
+    font-size: 1.05rem;
+    margin-bottom: 0.75rem;
+}
+
+.user-profile-widget .social-stats {
+    display: flex;
+    justify-content: space-around;
+    border-top: 1px solid var(--border-slate);
+    padding-top: 0.75rem;
+}
+
+.user-profile-widget .social-stats div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.user-profile-widget .social-stats span {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--primary);
+}
+
+.user-profile-widget .social-stats small {
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    margin-top: 0.15rem;
+}
+
+.followers-badge {
+    background-color: var(--panel-inner);
+    border: 1px solid var(--border-slate);
+    padding: 0.25rem 0.6rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    color: var(--accent);
+}
+
+.btn-follow-inline {
+    background: transparent !important;
+    border: 1px solid var(--primary) !important;
+    color: var(--primary) !important;
+    padding: 0.25rem 0.75rem !important;
+    border-radius: 6px;
+    font-size: 0.75rem !important;
+    cursor: pointer;
+    margin-left: auto;
+}
+
+.btn-follow-inline:hover {
+    background-color: var(--primary) !important;
+    color: white !important;
+}
+
+/* ==========================================================================
+   7. NESTED COMMENTS LAYOUT COMPONENT
+   ========================================================================== */
+.comments-section {
+    margin-top: 1.5rem;
+    border-top: 1px solid var(--border-slate);
+    padding-top: 1rem;
+}
+
+.comments-section h5 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.comments-list {
+    max-height: 250px;
+    overflow-y: auto;
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.comment-item {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background-color 0.2s ease;
+}
+
+.comment-item strong {
+    color: var(--primary);
+    margin-right: 0.35rem;
+}
+
+.no-comments-state {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-style: italic;
+    padding: 0.5rem 0;
+}
+
+.comment-action-delete {
+    opacity: 0;
+    visibility: hidden;
+    background: transparent;
+    border: none;
+    color: var(--danger);
+    cursor: pointer;
+    font-size: 0.9rem;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: opacity 0.2s ease, visibility 0.2s ease, background-color 0.2s ease;
+}
+
+.comment-item:hover .comment-action-delete {
+    opacity: 1;
+    visibility: visible;
+    
+}
+
+.comment-action-delete:hover {
+    background-color: rgba(239, 44, 44, 0.15);
+    
+}
+
+/* Inline comment form interface */
+.comment-input-box {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.comment-input-box input {
+    flex: 1;
+    background-color: var(--bg-dark);
+    border: 1px solid var(--border-slate);
+    color: white;
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    outline: none;
+}
+
+.comment-input-box input:focus {
+    border-color: var(--primary);
+}
+
+.comment-input-box button {
+    background-color: var(--primary);
+    border: none;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.comment-input-box button:hover {
+    background-color: #2563eb;
+}
+
+/* ==========================================================================
+   8. VISUAL MEDIA ATTACHMENTS (POSTED PICTURES DISPLAY)
+   ========================================================================== */
+.post-media-container {
+    margin-top: 1.2rem;
+    margin-bottom: 0.5rem;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--border-slate);
+    background-color: #0b0f19; /* Deep matte fallback shadow for loading states */
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+    transition: transform 0.2s ease;
+    max-width: 100%;
+    width: 100%;
+}
+
+.post-media-container:hover {
+    transform: scale(1.005);
+}
+
+.posted-feed-img {
+    width: 100%;
+    max-height: 450px;       /* Keeps images from occupying the whole vertical workspace */
+    object-fit: contain;       /* Crops clean cinematic center focus without pinching proportions */
+    object-position: center;
+    background-color: #020617;
+    display: block;
+    cursor: pointer;
+}
+
+/* Adjust layout on smaller tablet/mobile devices */
+@media (max-width: 768px) {
+    .post-media-container {
+        margin-top: 1rem;
+    }
+    .posted-feed-img {
+        max-height: 280px;   /* Shrinks container constraints smoothly on smaller phone screens */
+    }
+}
